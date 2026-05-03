@@ -1,6 +1,6 @@
 {
-  "name": "omninomics-v503-vercel-public-output-fix",
-  "version": "5.0.3",
+  "name": "omninomics-v505-signal-verification-live-scorecard",
+  "version": "5.0.5",
   "private": true,
   "scripts": {
     "build": "echo Static deployment - public output ready"

@@ -1,3 +1,34 @@
+OMNINOMICS v5.0.5 — Signal Verification & Live Scorecard
+
+Bu sürüm v5.0.4 Signal Calibration üzerine doğrulama ve canlı performans katmanı ekler.
+
+Eklenenler:
+1. Build Info kartı
+2. Self-test butonu / sistemi
+3. Raw → Final sinyal açıklaması
+4. Neden işlem yok paneli
+5. Sinyal yaşlandırma filtresi
+6. Retest teyit modu
+7. Wick / fakeout kalitesi filtresi
+8. Canlı sinyal karnesi
+9. Coin karakter profili
+10. BTC piyasa modu ana kilidi
+
+Önemli:
+- Türev verileri karar sistemine bağlı değildir.
+- Funding/OI/orderbook karar motoruna girmez.
+- Top 200 radar yoktur.
+- Canlı karne localStorage kullanır; tarayıcı bazlıdır.
+
+Yükleme:
+1. ZIP'i aç.
+2. GitHub repo köküne tüm dosyaları yükle.
+3. public/index.html dosyasının yüklendiğinden emin ol.
+4. Commit changes.
+5. Vercel deploy sonrası Ctrl+F5 yap.
+6. Sistem → Build Info ve Sistem → Self-Test sayfalarını kontrol et.
+
+--- Önceki README ---
 OMNINOMICS v5.0.4 — Signal Calibration Edition
 
 Bu sürüm çalışan Vercel paketinin üzerine sinyal doğruluğunu artırmaya yönelik kalibrasyon katmanı ekler.

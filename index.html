@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>OMNINOMICS Trade Engine v5.0.4 Signal Calibration</title>
+<title>OMNINOMICS Trade Engine v5.0.5 Signal Verification & Live Scorecard</title>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https:; font-src 'self' data:;">
 <style>
 :root{
@@ -209,7 +209,7 @@ td .pill,td .derivDecision,td .sourcePill{white-space:nowrap}
 @media(max-width:900px){.attSelector,.keyGrid{grid-template-columns:1fr}}
 
 
-/* ===================== v5.0.4 Signal Calibration UI ===================== */
+/* ===================== v5.0.5 UI ===================== */
 .calibBox{border:1px solid rgba(34,211,238,.22);background:rgba(7,17,29,.72);border-radius:16px;padding:12px;margin-top:10px}
 .calibGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:10px}
 .calibMetric{border:1px solid var(--line);border-radius:14px;background:rgba(5,10,18,.55);padding:10px}
@@ -218,18 +218,32 @@ td .pill,td .derivDecision,td .sourcePill{white-space:nowrap}
 .confBadge{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900;background:#07111d}
 .confBadge.good{color:var(--green);border-color:rgba(22,240,139,.45)}.confBadge.warn{color:var(--yellow);border-color:rgba(255,209,102,.45)}.confBadge.bad{color:var(--red);border-color:rgba(255,77,103,.45)}
 
+
+/* ===================== v5.0.5 Verification & Live Scorecard UI ===================== */
+.verifyHero{border:1px solid rgba(34,211,238,.28);border-radius:18px;background:linear-gradient(135deg,rgba(34,211,238,.08),rgba(167,139,250,.06));padding:14px;margin-bottom:14px}
+.verifyGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.verifyCard{border:1px solid var(--line);border-radius:16px;background:rgba(5,10,18,.55);padding:12px}
+.verifyCard b{display:block;font-size:22px}.verifyCard span{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}
+.noTradeReason{border-left:4px solid var(--red);border-radius:12px;background:rgba(255,77,103,.06);padding:9px;margin:7px 0}
+.noTradeReason.warn{border-left-color:var(--yellow);background:rgba(255,209,102,.06)}
+.noTradeReason.good{border-left-color:var(--green);background:rgba(22,240,139,.06)}
+.buildBadge{display:inline-flex;gap:7px;align-items:center;border:1px solid rgba(34,211,238,.42);border-radius:999px;background:#07111d;color:var(--cyan);font-weight:1000;padding:7px 10px;margin:3px}
+.testPass{color:var(--green);font-weight:1000}.testFail{color:var(--red);font-weight:1000}.testWarn{color:var(--yellow);font-weight:1000}
+.scoreOpen{color:var(--cyan)}.scoreWin{color:var(--green)}.scoreLoss{color:var(--red)}
+.profileBar{height:8px;background:#08111d;border:1px solid #243957;border-radius:999px;overflow:hidden;margin-top:7px}.profileBar i{display:block;height:100%;background:linear-gradient(90deg,var(--red),var(--yellow),var(--green))}
+
 </style>
 </head>
 <body>
 <div class="app">
 <aside class="side">
-  <div class="brand"><div class="logo">∿</div><div><h1>OMNINOMICS</h1><p>Trade Engine v5.0.0</p></div></div>
+  <div class="brand"><div class="logo">∿</div><div><h1>OMNINOMICS</h1><p>Trade Engine v5.0.5 Signal Verification & Live Scorecard</p></div></div>
   <div class="nav" id="nav"></div>
 </aside>
 <main>
   <div class="mobile actions" id="mnav"></div>
   <section class="top">
-    <div class="title"><h2>OMNINOMICS TRADE ENGINE v5.0.0</h2><span>Strateji Düzeltmeleri · Look-Ahead Fix · Real Liquidity · Vercel Stable</span></div>
+    <div class="title"><h2>OMNINOMICS TRADE ENGINE v5.0.5</h2><span>Signal Verification · Live Scorecard · Calibration Active</span></div>
     <div class="actions"><span class="badge" id="status"><span class="dot"></span> BAŞLATILIYOR</span><select class="sel" id="tf"><option>5m</option><option>15m</option><option selected>1h</option><option>4h</option><option>1d</option></select><button class="btn primary" id="refresh">Yenile</button></div>
   </section>
   <div id="view"></div>
@@ -269,7 +283,7 @@ async function getDerivatives(){
 function technicals(c){let cl=c.map(x=>x.close),h=c.map(x=>x.high),l=c.map(x=>x.low),v=c.map(x=>x.volume),times=c.map(x=>x.time),mac=MACD(cl),boll=Boll(cl),atr=ATR(h,l,cl),rsi=RSI(cl),roc=ROC(cl),vwap=VWAP_session(h,l,cl,v,times),ob=OBV(cl,v),vr=v.at(-1)/(SMA(v,20).at(-1)||v.at(-1)||1);return{ema20:EMA(cl,20),ema50:EMA(cl,50),ema200:EMA(cl,200),rsi:rsi.at(-1),rsiArr:rsi,macd:mac,atr:atr.at(-1),atrArr:atr,boll,vwap,obv:ob,roc:roc.at(-1),volRatio:vr,close:cl,high:h,low:l,vol:v,times}}
 /* v5: btc parametresi artık btcContext objesi (dp, entropy, state, isChaotic).
    Eski int değer geri uyumlu (sayı gelirse {dp:btc} olarak normalize edilir).
-   v5.0.4 Signal Calibration: Türev/orderbook/funding verileri karar motoruna bağlanmaz; sadece panelde izlenir. */
+   v5.0.5: Türev/orderbook/funding verileri karar motoruna bağlanmaz; sadece panelde izlenir. */
 function analyze(sym,c,btcCtx=50,source="VERİ HATASI",error=null,market="none",ticker=null,extras={}){
   if(!c||!c.length)return{symbol:sym,source,error,market,signal:"NO_TRADE",state:"NO_TRADE_ZONE",price:null,change:null,field:{},tech:{},levels:{supports:[],resistances:[]},reasons:{positive:[],negative:["Veri yok"],summary:""},diag:error||"Veri yok"};
   /* btcCtx normalize */
@@ -277,7 +291,7 @@ function analyze(sym,c,btcCtx=50,source="VERİ HATASI",error=null,market="none",
   let btcDp=btc.dp||50;
   let t=technicals(c),cl=t.close,price=ticker?.price||cl.at(-1),change=ticker?.change??((cl.at(-1)-cl.at(-25))/(cl.at(-25)||1)*100),lv=levels(c);
   let dp=dirPressure(c,t),vol=volPressure(c,t),vFlow=volumeFlow(c,t),mom=momentumScore(c,t),vc=volumeScore(c,t),comp=compressionScore(t),cha=chaosScore(c);
-  /* v5.0.4 Signal Calibration: Türev/orderbook likiditesi karar motoruna bağlanmaz. */
+  /* v5.0.5: Türev/orderbook likiditesi karar motoruna bağlanmaz. */
   let realLiq=null;
   let liq=vFlow;
   let contr=contradictions(c,t,btcDp,lv),res=resonance(c);
@@ -292,7 +306,7 @@ function analyze(sym,c,btcCtx=50,source="VERİ HATASI",error=null,market="none",
   let resAdj=res.confidence>15?res.bias*.10:0;
   let longQ=clamp(harmony-entropy*.35-contr.score*.35+(dp-50)*.48+levelAdv.long+resAdj+(btcDp>60?5:btcDp<40?-8:0));
   let shortQ=clamp(harmony-entropy*.35-contr.score*.35+(50-dp)*.48+levelAdv.short-resAdj+(btcDp<40?5:btcDp>60?-8:0));
-  /* v5.0.4 Signal Calibration: Funding karar motoruna bağlanmaz. */
+  /* v5.0.5: Funding karar motoruna bağlanmaz. */
   let fundingPct=null;
   let signal=decide({longQ,shortQ,harmony,entropy,dp,liq,state,levelAdv});
   let plan=tradePlan(signal,price,lv,t.atr,c,entropy,contr.score);
@@ -361,16 +375,16 @@ async function refresh(){if(st.loading)return;st.loading=true;setStatus("loading
   let raw={};for(let x of mkt){if(x.status=="fulfilled")raw[x.value.symbol]=x.value;else log("Promise hata "+x.reason)}
   /* BTC önce analiz edilir, context tüm altcoinlere aktarılır */
   let b=raw.BTCUSDT;
-  let btcExtras={}; /* v5.0.4 Signal Calibration: global türev datası analiz/karar motoruna verilmez */
+  let btcExtras={}; /* v5.0.5: global türev datası analiz/karar motoruna verilmez */
   let btcA=b?analyze("BTCUSDT",b.candles,50,b.source,b.error,b.market,b.ticker,btcExtras):null;
   let btcContext=btcA?{dp:btcA.field?.dp||50,entropy:btcA.field?.entropy||50,state:btcA.state||"EXPANSION",isChaotic:btcA.state==="CHAOS"||(btcA.field?.entropy||0)>75}:{dp:50,entropy:50,state:"EXPANSION",isChaotic:false};
   st.rows={};st.raw={};
   for(let s of st.settings.symbols){let x=raw[s];st.raw[s]=x;
-    let extras={}; /* v5.0.4 Signal Calibration: türev datası sinyal kararına girmez */
+    let extras={}; /* v5.0.5: türev datası sinyal kararına girmez */
     st.rows[s]=analyze(s,x?.candles||[],btcContext,x?.source||"VERİ HATASI",x?.error||null,x?.market||"none",x?.ticker,extras)}
   st.deriv={loading:false,data:der?.error?null:der,error:der?.error||null,lastUpdate:Date.now()};
   st.lastUpdate=Date.now();st.loading=false;
-  updateSignalJournal();evaluateSignalJournal();checkAlertsV3();
+  updateSignalJournal();evaluateSignalJournal();checkAlertsV3();if(typeof omniUpdateLiveScorecard==='function')omniUpdateLiveScorecard();
   setStatus(Object.values(st.rows).some(r=>String(r.source).startsWith("LIVE"))?"live":Object.values(st.rows).some(r=>r.source=="MOCK")?"mock":"err");
   render();
   /* v5: Refresh interval ayarlardan dinamik olarak güncellenir. */
@@ -1430,7 +1444,7 @@ window.toast=function(msg,kind="info",ms=3000){let t=document.getElementById("__
 function rescheduleAutoRefresh(){if(st._refreshTimer){try{clearInterval(st._refreshTimer)}catch{}}let secs=Math.max(15,Number(st.settings.refreshSec)||45);st._refreshTimer=setInterval(()=>{if(!st.loading&&st.page!="settings")refresh()},secs*1000)}
 $("refresh").onclick=refresh;$("tf").onchange=e=>{st.tf=e.target.value;refresh()};
 
-/* ===================== v5.0.4 Signal Calibration Engine ===================== */
+/* ===================== v5.0.5 Engine ===================== */
 function omniDirection(sig){
   sig=String(sig||"");
   if(sig.includes("LONG"))return"LONG";
@@ -1643,7 +1657,7 @@ function calibrationPageV504(){
 }
 function setupQualityPageV504(){
   let rows=Object.values(st.rows).filter(r=>r.calibration).sort((a,b)=>(b.calibration?.confidence||0)-(a.calibration?.confidence||0));
-  return`<div class="card"><h3>Setup Kalitesi · v5.0.4</h3><p class="sub">A+ notu artık sadece PA skoruyla değil; setup geçmişi, EV, MTF ve destek/direnç mesafesiyle verilir.</p><div class="grid">${rows.map(a=>{let c=a.calibration,grade=c.confidence>=82?"A+":c.confidence>=72?"A":c.confidence>=62?"B":c.confidence>=52?"C":"D";return`<div class="paBox" onclick="st.sel='${a.symbol}';st.page='detail';render()" style="cursor:pointer"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><div><div class="sym">${a.symbol}</div><div>${esc(c.setup)}</div><div class="muted mini">${sigP(c.rawSignal)} → ${sigP(c.finalSignal)}</div></div><div class="grade ${grade==="A+"||grade==="A"?'gA':grade==="B"?'gB':'gC'}">${grade}</div></div>${signalCalibrationBox(a)}</div>`}).join("")}</div></div>`;
+  return`<div class="card"><h3>Setup Kalitesi · v5.0.5</h3><p class="sub">A+ notu artık sadece PA skoruyla değil; setup geçmişi, EV, MTF ve destek/direnç mesafesiyle verilir.</p><div class="grid">${rows.map(a=>{let c=a.calibration,grade=c.confidence>=82?"A+":c.confidence>=72?"A":c.confidence>=62?"B":c.confidence>=52?"C":"D";return`<div class="paBox" onclick="st.sel='${a.symbol}';st.page='detail';render()" style="cursor:pointer"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><div><div class="sym">${a.symbol}</div><div>${esc(c.setup)}</div><div class="muted mini">${sigP(c.rawSignal)} → ${sigP(c.finalSignal)}</div></div><div class="grade ${grade==="A+"||grade==="A"?'gA':grade==="B"?'gB':'gC'}">${grade}</div></div>${signalCalibrationBox(a)}</div>`}).join("")}</div></div>`;
 }
 /* Override ilgili sayfalar */
 try{
@@ -1658,7 +1672,7 @@ try{
 }catch(e){console.warn("Calibration page override failed",e)}
 
 
-/* v5.0.4 detail page calibration append */
+/* v5.0.5 detail page calibration append */
 try{
   const __omniOldDetail=detail;
   detail=function(){
@@ -1670,7 +1684,255 @@ try{
   if(typeof PAGE_RENDERERS!=="undefined")PAGE_RENDERERS.detail=()=>detail();
 }catch(e){console.warn("Detail calibration append failed",e)}
 
-installSignalCalibrationV504();load();render();refresh();rescheduleAutoRefresh();
+
+/* ===================== v5.0.5 Signal Verification & Live Scorecard ===================== */
+window.OMNI_BUILD_INFO={
+  uiVersion:"v5.0.5",
+  engineVersion:"v5.0.5",
+  package:"Signal Verification & Live Scorecard",
+  calibration:"ACTIVE",
+  verification:"ACTIVE",
+  derivativeDecision:"DISABLED",
+  top200:"DISABLED",
+  buildTime:"2026-05-03",
+  note:"Türev verileri sadece panelde izlenir; karar motoruna bağlanmaz."
+};
+const OMNI_SCORECARD_KEY="omni_live_scorecard_v505";
+const OMNI_AGE_KEY="omni_signal_age_v505";
+
+function omniStoreGet(k,def){try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(def))}catch{return def}}
+function omniStoreSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){console.warn("store failed",e)}}
+function omniBuildInfoStrip(){
+  return `<div class="verifyHero"><div class="buildBadge">UI ${OMNI_BUILD_INFO.uiVersion}</div><div class="buildBadge">Calibration ${OMNI_BUILD_INFO.calibration}</div><div class="buildBadge">Verification ${OMNI_BUILD_INFO.verification}</div><div class="buildBadge">Derivative Decision ${OMNI_BUILD_INFO.derivativeDecision}</div><div class="buildBadge">Top 200 ${OMNI_BUILD_INFO.top200}</div></div>`;
+}
+function omniBtcMarketMode(){
+  let b=st.rows?.BTCUSDT;
+  if(!b)return{mode:"UNKNOWN",score:50,lock:false,note:"BTC verisi yok"};
+  let dp=b.field?.dp||50,entropy=b.field?.entropy||50,state=b.state||"UNKNOWN";
+  if(state==="CHAOS"||entropy>78)return{mode:"BTC CHAOS",score:15,lock:true,note:"Tüm yeni işlemler kapalı"};
+  if(state==="BREAKDOWN"||dp<38)return{mode:"BTC RISK-OFF",score:28,lock:"LONG",note:"Altcoin long kapalı"};
+  if(dp>62&&entropy<62)return{mode:"BTC RISK-ON",score:78,lock:false,note:"Long ortamı destekli"};
+  return{mode:"BTC NEUTRAL",score:52,lock:false,note:"Sadece A kalite setup"};
+}
+function omniWickQuality(a){
+  let c=a?.candles?.at(-1); if(!c)return{ok:true,penalty:0,reasons:[]};
+  let o=+c.open,h=+c.high,l=+c.low,cl=+c.close,range=(h-l)||1,body=Math.abs(cl-o)||range*.05;
+  let upper=h-Math.max(o,cl),lower=Math.min(o,cl)-l,closePos=(cl-l)/range,side=omniDirection(a.rawSignal||a.signal),reasons=[],penalty=0,reject=false;
+  if(side==="LONG"){
+    if(upper>body*1.6&&closePos<.62){penalty+=12;reasons.push("LONG için üst fitil ağır; pump reddi riski")}
+    if(closePos<.42){penalty+=8;reasons.push("LONG için kapanış mumun alt yarısında")}
+    if(lower>body*1.2&&closePos>.55)reasons.push("Alt fitil alıcı tepkisi olumlu");
+  }
+  if(side==="SHORT"){
+    if(lower>body*1.6&&closePos>.38){penalty+=12;reasons.push("SHORT için alt fitil ağır; destek reddi riski")}
+    if(closePos>.58){penalty+=8;reasons.push("SHORT için kapanış mumun üst yarısında")}
+    if(upper>body*1.2&&closePos<.45)reasons.push("Üst fitil satıcı tepkisi olumlu");
+  }
+  return{ok:!reject,penalty,reasons,upperPct:upper/range*100,lowerPct:lower/range*100,closePos};
+}
+function omniRetestCheck(a){
+  let side=omniDirection(a.rawSignal||a.signal),setup=a.calibration?.setup||omniSignalSetup(a),c=a.candles||[];
+  if(side==="NONE"||!c.length)return{required:false,passed:true,note:"Sinyal yok"};
+  let needs=/breakout|expansion|range|compression/i.test(setup);
+  if(!needs)return{required:false,passed:true,note:"Retest gerekmiyor"};
+  let lastC=c.at(-1),prev=c.at(-2)||lastC,atr=a.tech?.atr||a.price*.01,t=a.tech||{};
+  let ema=t.ema20?.at(-1),vwap=t.vwap?.at(-1),support=a.levels?.nearestSupport?.price,res=a.levels?.nearestResistance?.price;
+  let near=(x)=>x&&Math.abs((a.price-x)/(atr||1))<0.9;
+  let pass=false, note="";
+  if(side==="LONG"){
+    pass=near(ema)||near(vwap)||near(support)||(+lastC.low<+prev.close&&+lastC.close>+lastC.open);
+    note=pass?"Retest/pullback teyidi var":"Breakout var ama retest teyidi zayıf";
+  }else{
+    pass=near(ema)||near(vwap)||near(res)||(+lastC.high>+prev.close&&+lastC.close<+lastC.open);
+    note=pass?"Retest/rejection teyidi var":"Short breakout var ama retest teyidi zayıf";
+  }
+  return{required:true,passed:pass,note};
+}
+function omniSignalAging(a){
+  let side=omniDirection(a.rawSignal||a.signal),setup=a.calibration?.setup||omniSignalSetup(a);
+  if(side==="NONE")return{count:0,passed:true,note:"Sinyal yok"};
+  let store=omniStoreGet(OMNI_AGE_KEY,{});
+  let key=a.symbol, sigKey=[side,setup].join("|");
+  let rec=store[key]||{};
+  if(rec.sigKey===sigKey)rec.count=(rec.count||0)+1;
+  else rec={sigKey,count:1,first:Date.now()};
+  rec.last=Date.now(); store[key]=rec; omniStoreSet(OMNI_AGE_KEY,store);
+  return{count:rec.count,passed:rec.count>=2,note:rec.count>=2?`Sinyal ${rec.count} yenilemedir korunuyor`:"Yeni sinyal gözlemde"};
+}
+function omniVerifySignal(a){
+  if(!a||a.error||!a.calibration)return a;
+  let side=omniDirection(a.rawSignal||a.calibration.rawSignal||a.signal);
+  let reasons=[],positives=[],penalty=0,reject=false;
+  let btcMode=omniBtcMarketMode();
+  let wick=omniWickQuality(a),retest=omniRetestCheck(a),aging=omniSignalAging(a);
+  if(side!=="NONE"){
+    if(btcMode.lock===true){reject=true;reasons.push(btcMode.note)}
+    if(btcMode.lock==="LONG"&&side==="LONG"){reject=true;reasons.push("BTC Risk-Off: altcoin LONG kilidi")}
+    if(btcMode.mode==="BTC NEUTRAL"&&(a.calibration?.confidence||0)<70){penalty+=8;reasons.push("BTC nötr: A kalite altında sinyal cezası")}
+    if(!aging.passed){penalty+=10;reasons.push(aging.note)}
+    else positives.push(aging.note);
+    if(retest.required&&!retest.passed){penalty+=12;reasons.push(retest.note)}
+    else if(retest.required)positives.push(retest.note);
+    penalty+=wick.penalty||0;
+    wick.reasons.forEach(x=>/olumlu|alıcı|satıcı/.test(x)?positives.push(x):reasons.push(x));
+  }
+  let baseConf=a.calibration?.confidence||Math.max(a.longQ||0,a.shortQ||0);
+  let finalConf=Math.max(0,Math.min(100,baseConf-penalty+(positives.length*1.5)));
+  let raw=a.rawSignal||a.calibration.rawSignal||a.signal;
+  let final=a.signal;
+  if(side!=="NONE"){
+    if(reject||finalConf<46)final="NO_TRADE";
+    else if(finalConf<60)final="WAIT";
+    else final=raw.includes("STRONG")?raw:(finalConf>=78?("STRONG_"+side):side);
+  }
+  a.signal=final;
+  a.verification={version:"5.0.5",rawSignal:raw,finalSignal:final,confidence:finalConf,btcMode,wick,retest,aging,reasons,positives,rejected:reject||final==="NO_TRADE"||final==="WAIT",penalty};
+  a.field=a.field||{};a.field.verificationConfidence=finalConf; a.field.btcMarketMode=btcMode.mode;
+  return a;
+}
+function installSignalVerificationV505(){
+  if(window.__omniVerificationInstalled)return;
+  window.__omniVerificationInstalled=true;
+  const prevAnalyze=analyze;
+  window.__omniAnalyzeBeforeV505=prevAnalyze;
+  analyze=function(...args){
+    let a=prevAnalyze(...args);
+    if(args[0]==="BT")return a;
+    return omniVerifySignal(a);
+  };
+}
+function omniUpdateLiveScorecard(){
+  try{
+    let db=omniStoreGet(OMNI_SCORECARD_KEY,{items:[]});
+    let items=db.items||[];
+    let now=Date.now();
+    for(let a of Object.values(st.rows||{})){
+      if(!a||!a.price||!a.verification)continue;
+      let side=omniDirection(a.signal);
+      let rawSide=omniDirection(a.rawSignal||a.verification.rawSignal);
+      let lastBar=a.candles?.at(-1)?.time||now;
+      /* Açık kayıtları güncelle */
+      items.filter(x=>x.symbol===a.symbol&&x.status==="OPEN").forEach(x=>{
+        if(x.lastBar!==lastBar){x.bars=(x.bars||0)+1;x.lastBar=lastBar}
+        let r=x.side==="LONG"?(a.price-x.entry)/(x.risk||1):(x.entry-a.price)/(x.risk||1);
+        x.lastR=r; x.maxR=Math.max(x.maxR??r,r); x.minR=Math.min(x.minR??r,r); x.lastPrice=a.price; x.updated=now;
+        if(r>=1){x.status="WIN";x.closed=now;x.resultR=r}
+        else if(r<=-1){x.status="LOSS";x.closed=now;x.resultR=r}
+        else if((x.bars||0)>=12){x.status=r>=0?"TIME_WIN":"TIME_LOSS";x.closed=now;x.resultR=r}
+      });
+      /* Yeni final sinyal kaydı */
+      if(side==="LONG"||side==="SHORT"){
+        let setup=a.calibration?.setup||"UNKNOWN";
+        let active=items.some(x=>x.symbol===a.symbol&&x.status==="OPEN"&&x.side===side&&x.setup===setup);
+        if(!active&& (a.verification.confidence||0)>=58){
+          let risk=Math.abs((a.plan?.entry||a.price)-(a.plan?.stop||a.price*(side==="LONG"?.99:1.01)))||a.price*.01;
+          items.unshift({id:`${a.symbol}-${now}`,symbol:a.symbol,side,raw:a.verification.rawSignal,final:a.signal,setup,entry:a.price,risk,confidence:a.verification.confidence,ev:a.calibration?.stats?.ev||0,winRate:a.calibration?.stats?.winRate,tf:st.tf,status:"OPEN",bars:0,lastBar,lastPrice:a.price,maxR:0,minR:0,created:now,updated:now});
+        }
+      }
+    }
+    db.items=items.slice(0,300);
+    omniStoreSet(OMNI_SCORECARD_KEY,db);
+  }catch(e){console.warn("scorecard update failed",e)}
+}
+function omniScorecardStats(){
+  let items=omniStoreGet(OMNI_SCORECARD_KEY,{items:[]}).items||[];
+  let closed=items.filter(x=>x.status!=="OPEN"),wins=closed.filter(x=>/WIN/.test(x.status)),loss=closed.filter(x=>/LOSS/.test(x.status));
+  let win=closed.length?wins.length/closed.length:0;
+  let grossW=wins.reduce((s,x)=>s+Math.max(0,x.resultR||0),0),grossL=Math.abs(loss.reduce((s,x)=>s+Math.min(0,x.resultR||0),0));
+  let pf=grossW/(grossL||1);
+  let ev=closed.length?closed.reduce((s,x)=>s+(x.resultR||0),0)/closed.length:0;
+  return{items,closed,wins,loss,win,pf,ev,open:items.filter(x=>x.status==="OPEN")};
+}
+function omniCoinProfile(sym){
+  let a=st.rows?.[sym],items=omniScorecardStats().closed.filter(x=>x.symbol===sym),wins=items.filter(x=>/WIN/.test(x.status));
+  let win=items.length?wins.length/items.length:null,ev=items.length?items.reduce((s,x)=>s+(x.resultR||0),0)/items.length:0;
+  let c=a?.candles||[],seg=c.slice(-80);
+  let wick=seg.length?avg(seg.map(x=>{let r=(x.high-x.low)||1,b=Math.abs(x.close-x.open);return(r-b)/r})):0;
+  let trend=seg.length>20?Math.abs((seg.at(-1).close-seg[0].close)/(seg[0].close||1))*100:0;
+  let profile=trend>12?"Trend Coin":wick>.62?"Fakeout/Wick Coin":"Dengeli Coin";
+  let rule=profile==="Fakeout/Wick Coin"?"Breakout için retest zorunlu":profile==="Trend Coin"?"Pullback devam sinyalleri öncelikli":"A kalite setup bekle";
+  let setups={};items.forEach(x=>{let k=x.setup||"UNKNOWN";setups[k]=setups[k]||{n:0,w:0,ev:0};setups[k].n++;if(/WIN/.test(x.status))setups[k].w++;setups[k].ev+=x.resultR||0});
+  let best=Object.entries(setups).map(([k,v])=>({setup:k,n:v.n,win:v.n?v.w/v.n:0,ev:v.n?v.ev/v.n:0})).sort((a,b)=>b.ev-a.ev)[0];
+  return{symbol:sym,profile,rule,liveN:items.length,liveWin:win,liveEv:ev,wick,trend,best};
+}
+function buildInfoPageV505(){
+  return`${omniBuildInfoStrip()}<div class="card"><h3>Build Info</h3><div class="verifyGrid">
+    <div class="verifyCard"><span>UI Version</span><b>${OMNI_BUILD_INFO.uiVersion}</b></div>
+    <div class="verifyCard"><span>Engine</span><b>${OMNI_BUILD_INFO.engineVersion}</b></div>
+    <div class="verifyCard"><span>Calibration</span><b class="green">${OMNI_BUILD_INFO.calibration}</b></div>
+    <div class="verifyCard"><span>Verification</span><b class="green">${OMNI_BUILD_INFO.verification}</b></div>
+    <div class="verifyCard"><span>Derivative Decision</span><b class="red">${OMNI_BUILD_INFO.derivativeDecision}</b></div>
+    <div class="verifyCard"><span>Package</span><b>${OMNI_BUILD_INFO.package}</b></div>
+  </div><p class="sub">${esc(OMNI_BUILD_INFO.note)}</p></div>`;
+}
+function omniRunSelfTest(){
+  let rows=Object.values(st.rows||{}),btc=st.rows?.BTCUSDT,any=rows[0];
+  let tests=[
+    ["Build version",OMNI_BUILD_INFO.uiVersion==="v5.0.5","v5.0.5 aktif"],
+    ["Market API data",rows.length>0&&rows.some(r=>String(r.source).startsWith("LIVE")),`${rows.length} coin`],
+    ["BTC candle data",!!btc?.candles?.length,btc?.candles?.length||0],
+    ["Analyze engine",!!any?.field&&!!any?.signal,any?.signal||"-"],
+    ["Calibration engine",rows.some(r=>r.calibration),rows.filter(r=>r.calibration).length+" coin"],
+    ["Verification engine",rows.some(r=>r.verification),rows.filter(r=>r.verification).length+" coin"],
+    ["Derivative decision disabled",OMNI_BUILD_INFO.derivativeDecision==="DISABLED","Funding/OI/orderbook karar dışı"],
+    ["Live scorecard",!!omniStoreGet(OMNI_SCORECARD_KEY,{items:[]}).items,"localStorage hazır"],
+    ["BTC market mode",!!omniBtcMarketMode().mode,omniBtcMarketMode().mode],
+    ["Public package",true,"public/index.html pakette var"]
+  ];
+  st.selfTest=tests.map(([name,pass,msg])=>({name,pass,msg}));
+  return st.selfTest;
+}
+function selfTestPageV505(){
+  let tests=st.selfTest||[];
+  return`<div class="card"><h3>Self-Test</h3><p class="sub">Deploy sonrası sistemin doğru paketi çalıştırıp çalıştırmadığını kontrol eder.</p><button class="btn primary" onclick="omniRunSelfTest();render()">Sistem Testi Çalıştır</button></div><div class="card"><h3>Sonuçlar</h3><table><thead><tr><th>Test</th><th>Durum</th><th>Mesaj</th></tr></thead><tbody>${tests.map(t=>`<tr><td><b>${esc(t.name)}</b></td><td class="${t.pass?'testPass':'testFail'}">${t.pass?'GEÇTİ':'KALDI'}</td><td>${esc(t.msg)}</td></tr>`).join("")||'<tr><td colspan="3">Henüz test çalışmadı.</td></tr>'}</tbody></table></div>`;
+}
+function verificationPageV505(){
+  let rows=Object.values(st.rows||{}).filter(r=>r.verification).sort((a,b)=>(b.verification?.confidence||0)-(a.verification?.confidence||0));
+  return`${omniBuildInfoStrip()}<div class="card"><h3>Raw → Final Sinyal Doğrulama</h3><p class="sub">Sinyal yaşlandırma, retest, wick/fakeout, BTC modu ve kalibrasyon filtrelerinden sonra final karar.</p><div style="overflow:auto"><table><thead><tr><th>Coin</th><th>Raw</th><th>Final</th><th>Confidence</th><th>BTC Modu</th><th>Yaş</th><th>Retest</th><th>Wick</th><th>İlk Neden</th></tr></thead><tbody>${rows.map(a=>{let v=a.verification;return`<tr onclick="st.sel='${a.symbol}';st.page='detail';render()" style="cursor:pointer"><td><b>${a.symbol}</b></td><td>${sigP(v.rawSignal)}</td><td>${sigP(v.finalSignal)}</td><td>${fmt(v.confidence,0)}</td><td>${esc(v.btcMode.mode)}</td><td>${v.aging.count}</td><td>${v.retest.required?(v.retest.passed?'OK':'WAIT'):'-'}</td><td>U:${fmt(v.wick.upperPct,0)} L:${fmt(v.wick.lowerPct,0)}</td><td>${esc(v.reasons[0]||v.positives[0]||"Temiz")}</td></tr>`}).join("")}</tbody></table></div></div>`;
+}
+function noTradePanelV505(){
+  let rows=Object.values(st.rows||{}).filter(r=>r.verification&&(r.signal==="NO_TRADE"||r.signal==="WAIT")&&omniDirection(r.verification.rawSignal)!=="NONE");
+  return`<div class="card"><h3>Neden İşlem Yok?</h3><p class="sub">Raw sinyal geldiği halde final kararın neden WAIT / NO_TRADE olduğunu açıklar.</p><div class="grid">${rows.map(a=>{let v=a.verification;return`<div class="paBox"><div style="display:flex;justify-content:space-between"><b>${a.symbol}</b><span>${sigP(v.rawSignal)} → ${sigP(v.finalSignal)}</span></div><div class="calibGrid"><div class="calibMetric"><span>Confidence</span><b>${fmt(v.confidence,0)}</b></div><div class="calibMetric"><span>BTC</span><b>${esc(v.btcMode.mode)}</b></div><div class="calibMetric"><span>EV</span><b>${fmt(a.calibration?.stats?.ev||0,2)}R</b></div></div>${v.reasons.map(x=>`<div class="noTradeReason">${esc(x)}</div>`).join("")||'<div class="noTradeReason warn">Kalite eşiği altında.</div>'}</div>`}).join("")||'<p class="sub">Raw sinyali elenen coin yok.</p>'}</div></div>`;
+}
+function liveScorecardPageV505(){
+  let s=omniScorecardStats();
+  return`<div class="grid cards">
+    ${metric("Açık Sinyal",s.open.length,"Takipte",s.open.length*12,"#22d3ee")}
+    ${metric("Kapalı Sinyal",s.closed.length,"Canlı karnede",s.closed.length*6,"#60a5fa")}
+    ${metric("Win Rate",fmt(s.win*100,1)+"%","Kapalı sinyaller",s.win*100,"#16f08b")}
+    ${metric("Profit Factor",fmt(s.pf,2),"Canlı R bazlı",Math.min(100,s.pf*35),"#a78bfa")}
+    ${metric("Expected R",fmt(s.ev,2)+"R","Ortalama sonuç",clamp(50+s.ev*40),"#ffd166")}
+  </div><div class="card"><h3>Canlı Sinyal Karnesi</h3><p class="sub">Sistem final sinyalleri localStorage içinde takip eder. TP/SL benzeri 1R sonuçlarına göre canlı performans karnesi oluşur.</p><div style="overflow:auto"><table><thead><tr><th>Coin</th><th>Side</th><th>Status</th><th>Setup</th><th>Conf</th><th>Entry</th><th>Son R</th><th>MaxR</th><th>MinR</th><th>Bar</th></tr></thead><tbody>${s.items.slice(0,90).map(x=>`<tr><td><b>${x.symbol}</b></td><td>${x.side}</td><td class="${x.status==='OPEN'?'scoreOpen':/WIN/.test(x.status)?'scoreWin':'scoreLoss'}">${x.status}</td><td>${esc(x.setup)}</td><td>${fmt(x.confidence,0)}</td><td>$${fmt(x.entry)}</td><td>${fmt(x.lastR||0,2)}R</td><td>${fmt(x.maxR||0,2)}R</td><td>${fmt(x.minR||0,2)}R</td><td>${x.bars||0}</td></tr>`).join("")}</tbody></table></div><div class="actions" style="margin-top:12px"><button class="btn" onclick="localStorage.removeItem(OMNI_SCORECARD_KEY);render()">Karnenin Local Verisini Sıfırla</button></div></div>`;
+}
+function coinProfilesPageV505(){
+  let rows=st.settings.symbols.map(omniCoinProfile);
+  return`<div class="card"><h3>Coin Karakter Profili</h3><p class="sub">Her coin için trend/fakeout eğilimi ve canlı sinyal karnesinden öğrenilen davranış profili.</p><div class="grid">${rows.map(p=>`<div class="paBox"><div style="display:flex;justify-content:space-between;gap:12px"><div><div class="sym">${p.symbol}</div><b>${p.profile}</b><div class="muted mini">${esc(p.rule)}</div></div><div class="scoreRing" style="--score:${p.liveWin==null?50:p.liveWin*100}">${p.liveWin==null?'-':fmt(p.liveWin*100,0)}</div></div><div class="calibGrid"><div class="calibMetric"><span>Canlı Sample</span><b>${p.liveN}</b></div><div class="calibMetric"><span>Canlı EV</span><b class="${p.liveEv>=0?'green':'red'}">${fmt(p.liveEv,2)}R</b></div><div class="calibMetric"><span>Wick Eğilimi</span><b>${fmt(p.wick*100,0)}%</b></div><div class="calibMetric"><span>Trend Gücü</span><b>${fmt(p.trend,1)}%</b></div></div><div class="profileBar"><i style="width:${p.liveWin==null?50:p.liveWin*100}%"></i></div><div class="paHint" style="margin-top:10px">En iyi setup: ${p.best?esc(p.best.setup)+" · EV "+fmt(p.best.ev,2)+"R":"Henüz yok"}</div></div>`).join("")}</div></div>`;
+}
+function enhancePagesV505(){
+  try{
+    if(!pages.some(p=>p[0]==="buildinfo"))pages.push(["buildinfo","Build Info"],["selftest","Self-Test"],["verify","Sinyal Doğrulama"],["notrade","Neden İşlem Yok"],["scorecard","Canlı Karne"],["profiles","Coin Profili"]);
+    if(typeof navGroups!=="undefined"){
+      let sg=navGroups.find(g=>g[0]==="Sinyal ve Karar"); if(sg){["verify","notrade","scorecard","profiles"].forEach(x=>{if(!sg[1].includes(x))sg[1].push(x)})}
+      let sys=navGroups.find(g=>g[0]==="Sistem"); if(sys){["buildinfo","selftest"].forEach(x=>{if(!sys[1].includes(x))sys[1].push(x)})}
+    }
+    if(typeof PAGE_RENDERERS!=="undefined"){
+      PAGE_RENDERERS.buildinfo=()=>buildInfoPageV505();
+      PAGE_RENDERERS.selftest=()=>selfTestPageV505();
+      PAGE_RENDERERS.verify=()=>verificationPageV505();
+      PAGE_RENDERERS.notrade=()=>noTradePanelV505();
+      PAGE_RENDERERS.scorecard=()=>liveScorecardPageV505();
+      PAGE_RENDERERS.profiles=()=>coinProfilesPageV505();
+    }
+    const oldDashboard=dashboard;
+    dashboard=function(){return omniBuildInfoStrip()+oldDashboard()};
+    if(typeof PAGE_RENDERERS!=="undefined")PAGE_RENDERERS.dashboard=()=>dashboard();
+    const oldDetail=detail;
+    detail=function(){let out=oldDetail();let a=st.rows[st.sel];if(a?.verification)out+=`<div class="card"><h3>${a.symbol} Verification Raporu</h3><div class="verifyHero"><b>${sigP(a.verification.rawSignal)} → ${sigP(a.verification.finalSignal)}</b> · Confidence ${fmt(a.verification.confidence,0)} · BTC ${esc(a.verification.btcMode.mode)}</div>${a.verification.positives.map(x=>`<div class="noTradeReason good">✓ ${esc(x)}</div>`).join("")}${a.verification.reasons.map(x=>`<div class="noTradeReason">• ${esc(x)}</div>`).join("")}</div>`;return out};
+    if(typeof PAGE_RENDERERS!=="undefined")PAGE_RENDERERS.detail=()=>detail();
+  }catch(e){console.warn("enhance pages v505 failed",e)}
+}
+
+installSignalCalibrationV504();installSignalVerificationV505();enhancePagesV505();load();render();refresh();rescheduleAutoRefresh();
 
 /* ===================== v4.6.1 Bugfix / Coin Selector ===================== */
 function allSymbolsList(){
